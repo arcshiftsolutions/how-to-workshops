@@ -8,6 +8,13 @@ spec:
   monitoring:
     pgmonitor:
       exporter:
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "500Mi"
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
         image: registry.developers.crunchydata.com/crunchydata/crunchy-postgres-exporter:ubi8-5.0.4-0
   image: registry.developers.crunchydata.com/crunchydata/crunchy-postgres:centos8-13.5-0
   postgresVersion: 13
@@ -36,6 +43,14 @@ spec:
       global:
         repo1-retention-full: "2"
       image: registry.developers.crunchydata.com/crunchydata/crunchy-pgbackrest:centos8-2.35-0
+      repoHost:
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "500Mi"
+          limits:
+            cpu: "500m"
+            memory: "1Gi"  
       repos:
       - name: repo1
         schedules:
@@ -53,6 +68,13 @@ spec:
             storageClassName: netapp-file-backup
   proxy:
     pgBouncer:
+      resources:
+        requests:
+          cpu: "250m"
+          memory: "500Mi"
+        limits:
+          cpu: "500m"
+          memory: "1Gi"  
       config:
         global:
           client_tls_sslmode: disable
