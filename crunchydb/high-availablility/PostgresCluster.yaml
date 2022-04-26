@@ -47,10 +47,10 @@ spec:
         resources:
           requests:
             cpu: "125m"
-            memory: "250Mi"
+            memory: "125Mi"
           limits:
             cpu: "250m"
-            memory: "500Mi"  
+            memory: "250Mi"  
       repos:
       - name: repo1
         schedules:
@@ -71,10 +71,10 @@ spec:
       resources:
         requests:
           cpu: "125m"
-          memory: "250Mi"
+          memory: "125Mi"
         limits:
           cpu: "250m"
-          memory: "500Mi"  
+          memory: "250Mi"  
       config:
         global:
           client_tls_sslmode: disable
