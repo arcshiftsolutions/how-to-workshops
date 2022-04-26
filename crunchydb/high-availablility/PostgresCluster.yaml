@@ -2,8 +2,8 @@ apiVersion: postgres-operator.crunchydata.com/v1beta1
 kind: PostgresCluster
 metadata:
   labels:
-    app: hippo-ha
-  name: hippo-ha
+    app: edx-api-pgsql-ha
+  name: edx-api-pgsql-ha
 spec:
   monitoring:
     pgmonitor:
@@ -36,7 +36,7 @@ spec:
               topologyKey: kubernetes.io/hostname
               labelSelector:
                 matchLabels:
-                  postgres-operator.crunchydata.com/cluster: hippo-ha
+                  postgres-operator.crunchydata.com/cluster: edx-api-pgsql-ha
                   postgres-operator.crunchydata.com/instance-set: pgha1
   backups:
     pgbackrest:
@@ -88,5 +88,5 @@ spec:
               topologyKey: kubernetes.io/hostname
               labelSelector:
                 matchLabels:
-                  postgres-operator.crunchydata.com/cluster: hippo-ha
+                  postgres-operator.crunchydata.com/cluster: edx-api-pgsql-ha
                   postgres-operator.crunchydata.com/role: pgbouncer
