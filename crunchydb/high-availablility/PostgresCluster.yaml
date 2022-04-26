@@ -10,11 +10,11 @@ spec:
       exporter:
         resources:
           requests:
-            cpu: "250m"
-            memory: "500Mi"
+            cpu: "150m"
+            memory: "125Mi"
           limits:
-            cpu: "500m"
-            memory: "1Gi"
+            cpu: "300m"
+            memory: "250Mi"
         image: registry.developers.crunchydata.com/crunchydata/crunchy-postgres-exporter:ubi8-5.0.4-0
   image: registry.developers.crunchydata.com/crunchydata/crunchy-postgres:centos8-13.5-0
   postgresVersion: 13
