@@ -20,6 +20,13 @@ spec:
   postgresVersion: 13
   instances:
     - name: pgha1
+      resources:
+        requests:
+          cpu: "150m"
+          memory: "125Mi"
+        limits:
+          cpu: "300m"
+          memory: "250Mi"
       replicas: 3
       dataVolumeClaimSpec:
         accessModes:
