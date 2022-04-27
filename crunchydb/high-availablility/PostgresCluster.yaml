@@ -3,7 +3,6 @@ apiVersion: postgres-operator.crunchydata.com/v1beta1
 kind: PostgresCluster
 metadata:
   name: api-edx
-  namespace: default
   labels:
     name: api-edx
     solution: api-edx
