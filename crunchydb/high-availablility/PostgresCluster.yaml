@@ -1,99 +1,111 @@
+---
 apiVersion: postgres-operator.crunchydata.com/v1beta1
 kind: PostgresCluster
 metadata:
+  name: api-edx
+  namespace: default
   labels:
-    app: edx-api-pgsql-ha
-  name: edx-api-pgsql-ha
+    name: api-edx
+    solution: api-edx
+    app: api-edx
 spec:
-  monitoring:
-    pgmonitor:
-      exporter:
-        resources:
-          requests:
-            cpu: "150m"
-            memory: "125Mi"
-          limits:
-            cpu: "300m"
-            memory: "250Mi"
-        image: registry.developers.crunchydata.com/crunchydata/crunchy-postgres-exporter:ubi8-5.0.4-0
-  image: registry.developers.crunchydata.com/crunchydata/crunchy-postgres:centos8-13.5-0
-  postgresVersion: 13
+  postgresVersion: 14
   instances:
-    - name: pgha1
+    - name: api-edx
+      replicas: 3
       resources:
         requests:
-          cpu: "150m"
-          memory: "125Mi"
+          cpu: 50m
+          memory: 250Mi
         limits:
-          cpu: "300m"
-          memory: "250Mi"
-      replicas: 3
+          cpu: 250m
+          memory: 2Gi
       dataVolumeClaimSpec:
         accessModes:
-        - "ReadWriteOnce"
+          - ReadWriteOnce
         resources:
           requests:
-            storage: 1Gi
+            storage: 2Gi
         storageClassName: netapp-block-standard
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 1
-            podAffinityTerm:
-              topologyKey: kubernetes.io/hostname
-              labelSelector:
-                matchLabels:
-                  postgres-operator.crunchydata.com/cluster: edx-api-pgsql-ha
-                  postgres-operator.crunchydata.com/instance-set: pgha1
+            - weight: 1
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels:
+                    postgres-operator.crunchydata.com/cluster: api-edx
+                    postgres-operator.crunchydata.com/instance-set: postgres
+      sidecars:
+        replicaCertCopy:
+          resources:
+            requests:
+              cpu: 50m
+              memory: 100Mi
+            limits:
+              cpu: 250m
+              memory: 250Mi
   backups:
     pgbackrest:
       global:
         repo1-retention-full: "2"
-      image: registry.developers.crunchydata.com/crunchydata/crunchy-pgbackrest:centos8-2.35-0
       repoHost:
         resources:
           requests:
-            cpu: "125m"
-            memory: "125Mi"
+            cpu: 50m
+            memory: 100Mi
           limits:
-            cpu: "250m"
-            memory: "250Mi"  
+            cpu: 250m
+            memory: 1Gi
       repos:
-      - name: repo1
-        schedules:
-          # Full backup every day at 8:00am UTC
-          full: "0 8 * * *"
-          # Incremental backup every 4 hours, except at 8am UTC (when the full backup is running)
-          incremental: "0 0,4,12,16,20 * * *"
-        volume:
-          volumeClaimSpec:
-            accessModes:
-            - "ReadWriteOnce"
-            resources:
-              requests:
-                storage: 1Gi
-            storageClassName: netapp-file-backup
+        - name: repo1
+          schedules:
+            # Full backup every day at 8:00am UTC
+            full: "0 8 * * *"
+            # Incremental backup every 4 hours, except at 8am UTC (when the full backup is running)
+            incremental: "0 0,4,12,16,20 * * *"
+          volume:
+            volumeClaimSpec:
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 5Gi
+              storageClassName: netapp-file-backup
+      manual:
+        repoName: repo1
+        options:
+          - --type=full
+      sidecars:
+        pgbackrest:
+          resources:
+            requests:
+              cpu: 50m
+              memory: 50Mi
+            limits:
+              cpu: 250m
+              memory: 500Mi
   proxy:
     pgBouncer:
-      resources:
-        requests:
-          cpu: "125m"
-          memory: "125Mi"
-        limits:
-          cpu: "250m"
-          memory: "250Mi"  
       config:
         global:
           client_tls_sslmode: disable
-      image: registry.developers.crunchydata.com/crunchydata/crunchy-pgbouncer:centos8-1.15-3
       replicas: 2
+      resources:
+        requests:
+          cpu: 25m
+          memory: 100Mi
+        limits:
+          cpu: 50m
+          memory: 250Mi
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 1
-            podAffinityTerm:
-              topologyKey: kubernetes.io/hostname
-              labelSelector:
-                matchLabels:
-                  postgres-operator.crunchydata.com/cluster: edx-api-pgsql-ha
-                  postgres-operator.crunchydata.com/role: pgbouncer
+            - weight: 1
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels:
+                    postgres-operator.crunchydata.com/cluster: api-edx
+                    postgres-operator.crunchydata.com/role: pgbouncer
